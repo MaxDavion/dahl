@@ -14,6 +14,15 @@ def app (request):
     yield _browser
 
 
+@pytest.yield_fixture
+def litecart (request):
+    global _browser
+    if _browser is None:
+        _browser = Application()
+        _browser.open_litecart_admin()
+    yield _browser
+
+
 @pytest.yield_fixture(scope = "class", autouse = True)
 def teardown(request):
     yield teardown
