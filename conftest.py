@@ -1,29 +1,31 @@
 # -*- coding: utf-8 -*-
 import pytest
-from app import Application
+from app import AdminApp, WebApp
 
 
 
 _browser = None
 
-@pytest.yield_fixture
-def app (request):
-    global _browser
-    if _browser is None:
-        _browser = Application()
-    yield _browser
-
 
 @pytest.yield_fixture
-def litecart (request):
+def admin_app(request):
     global _browser
     if _browser is None:
-        _browser = Application()
+        _browser = AdminApp()
         _browser.open_litecart_admin()
     yield _browser
 
 
-@pytest.yield_fixture(scope = "class", autouse = True)
+@pytest.yield_fixture
+def web_app(request):
+    global _browser
+    if _browser is None:
+        _browser = WebApp()
+        _browser.open_litecart_web()
+    yield _browser
+
+
+@pytest.yield_fixture(autouse = True)
 def teardown(request):
     yield teardown
     global _browser

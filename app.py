@@ -4,8 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 
-class Application:
-
+class AdminApp:
     def __init__(self):
         self.chrome_options = Options()
         self.chrome_options.add_argument("--no-sandbox")
@@ -21,9 +20,6 @@ class Application:
         self.wd.find_element(By.NAME, 'password').click()
         self.wd.find_element(By.NAME, 'password').send_keys(password)
         self.wd.find_element(By.NAME, 'login').click()
-
-
-
 
     @property
     def number_menu_item(self):
@@ -50,6 +46,25 @@ class Application:
     def quit(self):
         self.wd.quit()
 
+
+class WebApp:
+    def __init__(self):
+        self.chrome_options = Options()
+        self.chrome_options.add_argument("--no-sandbox")
+        self.wd = webdriver.Chrome()
+        self.wd.maximize_window()
+
+    def open_litecart_web(self):
+        self.wd.get('http://localhost/litecart/')
+
+    @property
+    def product_card(self):
+        ''' Список карточек продукта на странице
+        '''
+        return self.wd.find_elements(By.CSS_SELECTOR, ".product")
+
+    def quit(self):
+        self.wd.quit()
 
 
 
