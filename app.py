@@ -11,8 +11,13 @@ class AdminApp:
         self.wd = webdriver.Chrome()
         self.wd.maximize_window()
 
+    base_url = 'http://localhost/litecart/admin/'
+
     def open_litecart_admin(self):
-        self.wd.get('http://localhost/litecart/admin/')
+        self.wd.get(self.base_url)
+
+    def open_page(self, url):
+        self.wd.get(self.base_url + url)
 
     def login_as(self, username, password):
         self.wd.find_element(By.NAME, 'username').click()
@@ -20,6 +25,11 @@ class AdminApp:
         self.wd.find_element(By.NAME, 'password').click()
         self.wd.find_element(By.NAME, 'password').send_keys(password)
         self.wd.find_element(By.NAME, 'login').click()
+
+    def quit(self):
+        self.wd.quit()
+
+    # --------------------    Side Menu   -----------------------
 
     @property
     def number_menu_item(self):
@@ -43,8 +53,46 @@ class AdminApp:
         '''
         self.wd.find_elements(By.CSS_SELECTOR, "#box-apps-menu #app- li")[item].click()
 
-    def quit(self):
-        self.wd.quit()
+    # --------------------    Countries   -----------------------
+
+    @property
+    def countries_table(self):
+        ''' Получить список строк таблицы стран
+        '''
+        return self.wd.find_elements(By.CSS_SELECTOR, '[name="countries_form"] tr.row')
+
+    def open_country_page_by_index(self, index):
+        ''' Среди всех стран в таблице выбрать страну по индексу и перейти в нее
+        '''
+        self.countries_table[index].find_element(By.CSS_SELECTOR, "a").click()
+
+    @property
+    def zones_table(self):
+        ''' Получить список строк таблицы зон
+        '''
+        return self.wd.find_elements(By.CSS_SELECTOR, '.dataTable tr:not(.header)')[:-1]
+
+
+    # --------------------    Geo Zones   -----------------------
+
+    @property
+    def number_items(self):
+        ''' Кол-во пукнтов геозон в таблице
+        '''
+        return len(self.wd.find_elements(By.CSS_SELECTOR, "[name='geo_zones_form'] tr.row"))
+
+    def open_geo_zone_page(self, item):
+        ''' Перейти на страницу выбранного пункта
+        '''
+        row = self.wd.find_elements(By.CSS_SELECTOR, "[name='geo_zones_form'] tr.row")[item]
+        row.find_element(By.CSS_SELECTOR, "a:not([title])").click()
+
+    @property
+    def selected_zones_list(self):
+        ''' Возвращает список элементов выбранных зон из таблыицы зон
+        '''
+        return self.wd.find_elements(By.CSS_SELECTOR, ".dataTable select[name*=zone_code] option[selected]")
+
 
 
 class WebApp:
