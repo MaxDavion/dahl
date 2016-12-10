@@ -61,5 +61,45 @@ class TestWebLitecart:
             assert_that(len(stickers_on_product_card), equal_to(1))
             assert_that(stickers_on_product_card[0].text, not_none())
 
+    def test_that_open_right_product_page_when_user_click_on_the_product_in_campaign_section(self, web_app):
+        products = web_app.list_product_cards_in_campaign_section
+        product_link = products[0].find_element(By.CSS_SELECTOR, "a").get_attribute("href")
+        product_name = products[0].find_element(By.CSS_SELECTOR, ".name").text
+        product_regular_price = products[0].find_element(By.CSS_SELECTOR, ".regular-price").text
+        product_campaign_price = products[0].find_element(By.CSS_SELECTOR, ".campaign-price").text
+        products[0].click()
+        assert_that(product_link, equal_to(web_app.current_url))
+        assert_that(product_name, equal_to(web_app.wd.find_element(By.CSS_SELECTOR, "#box-product h1").text))
+        assert_that(product_regular_price, equal_to(web_app.wd.find_element(By.CSS_SELECTOR, "#box-product .regular-price").text))
+        assert_that(product_campaign_price, equal_to(web_app.wd.find_element(By.CSS_SELECTOR, "#box-product .campaign-price").text))
 
+    def test_that_regular_price_for_product_in_campaign_is_grey_and_small_and_strike(self, web_app):
+        # На главной странице
+        products = web_app.list_product_cards_in_campaign_section
+        product_regular_price = products[0].find_element(By.CSS_SELECTOR, ".regular-price")
+        (color, size, text_style) = web_app.get_element_style(product_regular_price)
+        assert_that(color, equal_to("rgba(119, 119, 119, 1)"))
+        assert_that(size, equal_to("14.4px"))
+        assert_that(text_style, equal_to("line-through"))
+        # На странице товара
+        products[0].click()
+        product_regular_price = web_app.wd.find_element(By.CSS_SELECTOR, "#box-product .regular-price")
+        (color, size, text_style) = web_app.get_element_style(product_regular_price)
+        assert_that(color, equal_to("rgba(102, 102, 102, 1)"))
+        assert_that(size, equal_to("16px"))
+        assert_that(text_style, equal_to("line-through"))
+
+    def test_that_campaign_price_for_product_in_campaign_is_red_and_big(self, web_app):
+        # На главной странице
+        products = web_app.list_product_cards_in_campaign_section
+        product_campaign_price = products[0].find_element(By.CSS_SELECTOR, ".campaign-price")
+        (color, size, text_style) = web_app.get_element_style(product_campaign_price)
+        assert_that(color, equal_to("rgba(204, 0, 0, 1)"))
+        assert_that(size, equal_to("18px"))
+        # На странице товара
+        products[0].click()
+        product_campaign_price = web_app.wd.find_element(By.CSS_SELECTOR, "#box-product .campaign-price")
+        (color, size, text_style) = web_app.get_element_style(product_campaign_price)
+        assert_that(color, equal_to("rgba(204, 0, 0, 1)"))
+        assert_that(size, equal_to("22px"))
 

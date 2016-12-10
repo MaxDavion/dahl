@@ -102,17 +102,43 @@ class WebApp:
         self.wd = webdriver.Chrome()
         self.wd.maximize_window()
 
+    @property
+    def current_url(self):
+        return self.wd.current_url
+
     def open_litecart_web(self):
         self.wd.get('http://localhost/litecart/')
 
+    def quit(self):
+        self.wd.quit()
+
+    # --------------------    Main Page   -----------------------
+
     @property
     def product_card(self):
-        ''' Список карточек продукта на странице
+        ''' Все карточки продукта на странице
         '''
         return self.wd.find_elements(By.CSS_SELECTOR, ".product")
 
-    def quit(self):
-        self.wd.quit()
+    @property
+    def list_product_cards_in_campaign_section(self):
+        ''' Карточки продукта в секции campaign
+        '''
+        return self.wd.find_elements(By.CSS_SELECTOR, "#box-campaigns li")
+
+    def get_element_style(self, element):
+        '''Вернуть стиль элемента (цвет, размер, стиль текста)
+        '''
+        color = element.value_of_css_property("color")
+        size = element.value_of_css_property("font-size")
+        text_style = element.value_of_css_property("text-decoration")
+        return (color, size, text_style)
+
+
+
+
+
+
 
 
 
