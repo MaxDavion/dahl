@@ -2,6 +2,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 
 class AdminApp:
@@ -102,15 +103,23 @@ class WebApp:
         self.wd = webdriver.Chrome()
         self.wd.maximize_window()
 
+    base_url = 'http://localhost/litecart/'
+
     @property
     def current_url(self):
         return self.wd.current_url
 
     def open_litecart_web(self):
-        self.wd.get('http://localhost/litecart/')
+        self.wd.get(self.base_url)
+
+    def open_page(self, url):
+        self.wd.get(self.base_url + url)
 
     def quit(self):
         self.wd.quit()
+
+    def force_logout(self):
+        self.open_page('en/logout')
 
     # --------------------    Main Page   -----------------------
 
@@ -135,7 +144,49 @@ class WebApp:
         return (color, size, text_style)
 
 
+    # --------------------    Singup & Login   -----------------------
 
+    def fill_singup_form(self, firstname=None, lastname=None, address1=None, postcode=None, city=None, country=None,
+                         email=None, phone=None, password=None, confirmed_password=None):
+        ''' Заполнить форму регистрации
+        '''
+        #TODO: Сделать обертку для работы с текстовым полем и с выпадающим списком.
+        self.wd.find_element(By.NAME, "firstname").click()
+        self.wd.find_element(By.NAME, "firstname").send_keys(firstname)
+        self.wd.find_element(By.NAME, "lastname").click()
+        self.wd.find_element(By.NAME, "lastname").send_keys(lastname)
+        self.wd.find_element(By.NAME, "address1").click()
+        self.wd.find_element(By.NAME, "address1").send_keys(address1)
+        self.wd.find_element(By.NAME, "postcode").click()
+        self.wd.find_element(By.NAME, "postcode").send_keys(postcode)
+        self.wd.find_element(By.NAME, "city").click()
+        self.wd.find_element(By.NAME, "city").send_keys(city)
+        self.wd.find_element(By.CSS_SELECTOR, ".select2-selection").click()
+        self.wd.find_element(By.CSS_SELECTOR, ".select2-search__field").click()
+        self.wd.find_element(By.CSS_SELECTOR, ".select2-search__field").send_keys(country)
+        self.wd.find_element(By.CSS_SELECTOR, ".select2-search__field").send_keys(Keys.ENTER)
+        self.wd.find_element(By.NAME, "email").click()
+        self.wd.find_element(By.NAME, "email").send_keys(email)
+        self.wd.find_element(By.NAME, "phone").click()
+        self.wd.find_element(By.NAME, "phone").send_keys(phone)
+        self.wd.find_element(By.NAME, "password").click()
+        self.wd.find_element(By.NAME, "password").send_keys(password)
+        self.wd.find_element(By.NAME, "confirmed_password").click()
+        self.wd.find_element(By.NAME, "confirmed_password").send_keys(confirmed_password)
+
+    def click_singup(self):
+        self.wd.find_element(By.NAME, "create_account").click()
+
+    def fill_login_form(self, email=None,password=None):
+        ''' Заполнить форму авторизации на главной странице
+        '''
+        self.wd.find_element(By.NAME, "email").click()
+        self.wd.find_element(By.NAME, "email").send_keys(email)
+        self.wd.find_element(By.NAME, "password").click()
+        self.wd.find_element(By.NAME, "password").send_keys(password)
+
+    def click_login(self):
+        self.wd.find_element(By.NAME, "login").click()
 
 
 

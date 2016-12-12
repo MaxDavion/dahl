@@ -3,7 +3,8 @@ import pytest
 from selenium.webdriver.common.by import By
 from hamcrest import *
 import time
-
+from faker import Factory
+from user import *
 
 class TestAdminLitecart:
 
@@ -102,4 +103,19 @@ class TestWebLitecart:
         (color, size, text_style) = web_app.get_element_style(product_campaign_price)
         assert_that(color, equal_to("rgba(204, 0, 0, 1)"))
         assert_that(size, equal_to("22px"))
+
+    def test_user_can_singup_and_login_in_web_app(self, web_app):
+        user = generate_random_data_for_user()
+        web_app.open_page("create_account")
+        web_app.fill_singup_form(firstname=user.firstname, lastname=user.lastname, address1=user.address1,
+                                 postcode=user.postcode, city=user.city, country=user.country, email=user.email,
+                                 phone=user.phone, password=user.password, confirmed_password=user.confirmed_password)
+        web_app.click_singup()
+        web_app.force_logout()
+        web_app.fill_login_form(email=user.email, password=user.password)
+        web_app.click_login()
+        assert_that(web_app.wd.find_element(By.CSS_SELECTOR, "#notices .success").text,
+                    equal_to("You are now logged in as %s %s." % (user.firstname, user.lastname)))
+
+
 
