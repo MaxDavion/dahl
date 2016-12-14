@@ -73,9 +73,6 @@ class TestAdminLitecart:
 
 
 
-
-
-
 class TestWebLitecart:
 
     def test_user_can_see_one_sticker_for_every_product_card(self, web_app):
@@ -139,12 +136,13 @@ class TestWebLitecart:
         assert_that(web_app.wd.find_element(By.CSS_SELECTOR, "#notices .success").text,
                     equal_to("You are now logged in as %s %s." % (user.firstname, user.lastname)))
 
-
-
-
-def test_random_image():
-    images_list = [ 'resousce/test_product_1.JPG',
-                       'resousce/test_product_2.JPG']
-    image = random.choice(images_list)
-    print os.path.join(os.path.dirname(os.path.abspath(__file__)), image)
-    print os.path.dirname(os.path.abspath(__file__))
+    def test_user_can_add_some_product_in_cart_and_then_remove_them_all_from_the_cart(self, web_app):
+        for i in xrange(3):
+            web_app.product_card[i].click()
+            web_app.add_product_to_cart()
+            web_app.open_litecart_main_page()
+        web_app.open_cart()
+        for i in xrange(3):
+            web_app.remove_product_from_cart()
+        assert_that(web_app.wd.find_element(By.CSS_SELECTOR, "#checkout-cart-wrapper").text,
+                        contains_string("There are no items in your cart."))

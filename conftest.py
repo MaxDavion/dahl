@@ -21,7 +21,7 @@ def web_app(request):
     global _browser
     if _browser is None:
         _browser = WebApp()
-        _browser.open_litecart_web()
+        _browser.open_litecart_main_page()
     yield _browser
 
 

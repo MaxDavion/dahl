@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class AdminApp:
@@ -185,21 +187,6 @@ class AdminApp:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class WebApp:
     def __init__(self):
         self.chrome_options = Options()
@@ -213,7 +200,7 @@ class WebApp:
     def current_url(self):
         return self.wd.current_url
 
-    def open_litecart_web(self):
+    def open_litecart_main_page(self):
         self.wd.get(self.base_url)
 
     def open_page(self, url):
@@ -293,7 +280,30 @@ class WebApp:
         self.wd.find_element(By.NAME, "login").click()
 
 
+    # --------------------    Cart   -----------------------
 
+    def add_product_to_cart(self):
+        ''' Добавить выбранный товар в корзину
+        '''
+        wd = self.wd
+        if len(wd.find_elements(By.NAME, "options[Size]")) == 1:
+            select = Select(self.wd.find_element_by_name("options[Size]"))
+            select.select_by_visible_text("Small")
+        cart_quantity = int(wd.find_element(By.CSS_SELECTOR, "#cart a .quantity").text)
+        wd.find_element(By.NAME, "add_cart_product").click()
+        wait = WebDriverWait(wd, 10)
+        wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, "#cart a .quantity"), str(cart_quantity + 1)))
 
+    def open_cart(self):
+        ''' Открыть корзину
+        '''
+        self.wd.find_element(By.CSS_SELECTOR, "#header-wrapper #cart").click()
 
-
+    def remove_product_from_cart(self):
+        ''' Удалить продукт из корзины
+        '''
+        wd = self.wd
+        cart_quantity = len(wd.find_elements(By.CSS_SELECTOR, "#order_confirmation-wrapper :not(.header)>.item"))
+        wd.find_element(By.NAME, "remove_cart_item").click()
+        wait = WebDriverWait(wd, 10)
+        wait.until(lambda wd: len(wd.find_elements(By.CSS_SELECTOR, "#order_confirmation-wrapper :not(.header)>.item")) == cart_quantity - 1)
