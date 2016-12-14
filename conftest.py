@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from app import AdminApp, WebApp
-
+import os
 
 
 _browser = None
@@ -32,3 +32,7 @@ def teardown(request):
     if _browser:
         _browser.quit()
         _browser = None
+
+
+def path():
+    return os.path.dirname(os.path.abspath(__file__))

@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
 
 
 class AdminApp:
@@ -26,6 +27,13 @@ class AdminApp:
         self.wd.find_element(By.NAME, 'password').click()
         self.wd.find_element(By.NAME, 'password').send_keys(password)
         self.wd.find_element(By.NAME, 'login').click()
+
+    def set_date(self, date, selector):
+        self.wd.find_element(By.NAME, selector).click()
+        self.wd.find_element(By.NAME, selector).send_keys(Keys.HOME)
+        self.wd.find_element(By.NAME, selector).send_keys(date.day)
+        self.wd.find_element(By.NAME, selector).send_keys(date.month)
+        self.wd.find_element(By.NAME, selector).send_keys(date.year)
 
     def quit(self):
         self.wd.quit()
@@ -93,6 +101,102 @@ class AdminApp:
         ''' Возвращает список элементов выбранных зон из таблыицы зон
         '''
         return self.wd.find_elements(By.CSS_SELECTOR, ".dataTable select[name*=zone_code] option[selected]")
+
+
+    # --------------------    Catalog   -----------------------
+
+    @property
+    def list_products_in_root_category(self):
+        return self.wd.find_elements(By.CSS_SELECTOR, ".dataTable .row")
+
+
+    def click_add_new_product(self):
+        self.wd.find_element(By.CSS_SELECTOR, "#content .button:nth-child(2)").click()
+
+    def fill_add_product_form_section_general(self, enabled, name, code, quantity, image, date_valid_from, date_valid_to):
+
+        if enabled:
+            self.wd.find_element(By.CSS_SELECTOR, "[name='status'][value='1']").click()
+        else:
+            self.wd.find_element(By.CSS_SELECTOR, "[name='status'][value='2']").click()
+
+        self.wd.find_element(By.NAME, "name[en]").click()
+        self.wd.find_element(By.NAME, "name[en]").send_keys(name)
+        self.wd.find_element(By.NAME, "code").click()
+        self.wd.find_element(By.NAME, "code").send_keys(code)
+
+
+        for i in self.wd.find_elements(By.NAME, "categories[]"):
+            if not i.get_attribute("checked"):
+                i.click()
+
+        for i in self.wd.find_elements(By.NAME, "product_groups[]"):
+            if not i.get_attribute("checked"):
+                i.click()
+
+        self.wd.find_element(By.NAME, "quantity").click()
+        self.wd.find_element(By.NAME, "quantity").clear()
+        self.wd.find_element(By.NAME, "quantity").send_keys(quantity)
+
+        self.wd.find_element(By.NAME, "new_images[]").send_keys(image)
+
+        self.set_date(date=date_valid_from, selector="date_valid_from")
+        self.set_date(date=date_valid_to, selector="date_valid_to")
+
+    def fill_add_product_form_section_information(self, manufacturer_id, short_description, full_description,
+                                                  head_title):
+        self.wd.find_element(By.CSS_SELECTOR, "[href='#tab-information']").click()
+
+        select = Select(self.wd.find_element_by_name("manufacturer_id"))
+        select.select_by_visible_text(manufacturer_id)
+
+        self.wd.find_element(By.NAME, 'short_description[en]').click()
+        self.wd.find_element(By.NAME, 'short_description[en]').clear()
+        self.wd.find_element(By.NAME, 'short_description[en]').send_keys(short_description)
+
+        self.wd.find_element(By.CSS_SELECTOR, '.trumbowyg-editor').click()
+        self.wd.find_element(By.CSS_SELECTOR, '.trumbowyg-editor').clear()
+        self.wd.find_element(By.CSS_SELECTOR, '.trumbowyg-editor').send_keys(full_description)
+
+        self.wd.find_element(By.NAME, 'head_title[en]').click()
+        self.wd.find_element(By.NAME, 'head_title[en]').clear()
+        self.wd.find_element(By.NAME, 'head_title[en]').send_keys(head_title)
+
+    def fill_add_product_form_section_prices(self, purchase_price, currency_code, prices_usd, prices_eur):
+        self.wd.find_element(By.CSS_SELECTOR, "[href='#tab-prices']").click()
+
+        self.wd.find_element(By.NAME, "purchase_price").click()
+        self.wd.find_element(By.NAME, "purchase_price").clear()
+        self.wd.find_element(By.NAME, "purchase_price").send_keys(purchase_price)
+
+        select = Select(self.wd.find_element_by_name("purchase_price_currency_code"))
+        select.select_by_value(currency_code)
+
+        self.wd.find_element(By.NAME, "prices[USD]").click()
+        self.wd.find_element(By.NAME, "prices[USD]").send_keys(prices_usd)
+
+        self.wd.find_element(By.NAME, "prices[EUR]").click()
+        self.wd.find_element(By.NAME, "prices[EUR]").send_keys(prices_eur)
+
+    def click_save_product(self):
+        self.wd.find_element(By.NAME, "save").click()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
-from selenium.webdriver.common.by import By
 from hamcrest import *
-import time
-from faker import Factory
-from user import *
+from selenium.webdriver.common.by import By
+from model.user import *
+from model.product import *
 
 class TestAdminLitecart:
 
@@ -48,6 +46,30 @@ class TestAdminLitecart:
             zones_list = [zone.text for zone in admin_app.selected_zones_list]
             assert_that(zones_list, equal_to(sorted(zones_list)))
             admin_app.wd.back()
+
+    def test_that_user_can_add_new_product(self, admin_app):
+        # Предусловия
+        product = generate_random_data_for_product()
+        admin_app.login_as(username='admin', password='admin')
+        admin_app.open_page("?app=catalog")
+        count_products_before = len(admin_app.list_products_in_root_category)
+        # Шаги
+        admin_app.click_add_new_product()
+        admin_app.fill_add_product_form_section_general(enabled=product.enabled, name=product.name, code=product.code,
+                                                       quantity=product.quantity, image=product.image,
+                                                       date_valid_from=product.date_valid_from,
+                                                       date_valid_to=product.date_valid_to)
+        admin_app.fill_add_product_form_section_information(manufacturer_id=product.manufacturer_id,
+                                                            short_description=product.short_description,
+                                                            full_description=product.full_description,
+                                                            head_title=product.head_title)
+        admin_app.fill_add_product_form_section_prices(purchase_price=product.purchase_price,
+                                                       currency_code=product.currency_code,
+                                                       prices_usd=product.prices_usd, prices_eur=product.prices_eur)
+        admin_app.click_save_product()
+        # Проверки
+        assert_that(count_products_before + 1, equal_to(len(admin_app.list_products_in_root_category)))
+        assert_that([i.text for i in admin_app.list_products_in_root_category], has_item(product.name))
 
 
 
@@ -119,3 +141,10 @@ class TestWebLitecart:
 
 
 
+
+def test_random_image():
+    images_list = [ 'resousce/test_product_1.JPG',
+                       'resousce/test_product_2.JPG']
+    image = random.choice(images_list)
+    print os.path.join(os.path.dirname(os.path.abspath(__file__)), image)
+    print os.path.dirname(os.path.abspath(__file__))
