@@ -3,6 +3,7 @@ from hamcrest import *
 from selenium.webdriver.common.by import By
 from model.user import *
 from model.product import *
+import time
 
 class TestAdminLitecart:
 
@@ -70,6 +71,19 @@ class TestAdminLitecart:
         # Проверки
         assert_that(count_products_before + 1, equal_to(len(admin_app.list_products_in_root_category)))
         assert_that([i.text for i in admin_app.list_products_in_root_category], has_item(product.name))
+
+
+    def test_that_link_open_in_new_tab(self, admin_app):
+        # Предусловия
+        admin_app.login_as(username='admin', password='admin')
+        admin_app.open_page("?app=countries")
+        admin_app.open_country_page_by_index(0)
+        main_window = admin_app.wd.current_window_handle
+        for i in admin_app.external_links_on_page:
+            i.click()
+            admin_app.switch_to_new_tab()
+            admin_app.wd.close()
+            admin_app.wd.switch_to_window(main_window)
 
 
 

@@ -23,6 +23,13 @@ class AdminApp:
     def open_page(self, url):
         self.wd.get(self.base_url + url)
 
+    def switch_to_new_tab(self):
+        wd = self.wd
+        tab_list = wd.window_handles
+        wait = WebDriverWait(wd, 10)
+        wait.until(lambda wd: len(wd.window_handles) == 2)
+        self.wd.switch_to_window(tab_list[-1])
+
     def login_as(self, username, password):
         self.wd.find_element(By.NAME, 'username').click()
         self.wd.find_element(By.NAME, 'username').send_keys(username)
@@ -82,6 +89,10 @@ class AdminApp:
         ''' Получить список строк таблицы зон
         '''
         return self.wd.find_elements(By.CSS_SELECTOR, '.dataTable tr:not(.header)')[:-1]
+
+    @property
+    def external_links_on_page(self):
+        return self.wd.find_elements(By.CSS_SELECTOR, '.fa-external-link')
 
 
     # --------------------    Geo Zones   -----------------------
