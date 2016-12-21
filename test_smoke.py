@@ -72,9 +72,7 @@ class TestAdminLitecart:
         assert_that(count_products_before + 1, equal_to(len(admin_app.list_products_in_root_category)))
         assert_that([i.text for i in admin_app.list_products_in_root_category], has_item(product.name))
 
-
     def test_that_link_open_in_new_tab(self, admin_app):
-        # Предусловия
         admin_app.login_as(username='admin', password='admin')
         admin_app.open_page("?app=countries")
         admin_app.open_country_page_by_index(0)
@@ -84,6 +82,15 @@ class TestAdminLitecart:
             admin_app.switch_to_new_tab()
             admin_app.wd.close()
             admin_app.wd.switch_to_window(main_window)
+
+    def test_that_browser_log_not_have_messages(self, admin_app):
+        admin_app.login_as(username='admin', password='admin')
+        admin_app.open_page("?app=catalog&doc=catalog&category_id=1")
+        for i in xrange(len(admin_app.list_all_products_in_catalog)):
+            admin_app.open_product_page_by_index(i)
+            log_text = "\n".join([str(l) for l in admin_app.wd.get_log("browser")])
+            assert_that(log_text, empty())
+            admin_app.wd.back()
 
 
 

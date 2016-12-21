@@ -6,14 +6,21 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class AdminApp:
     def __init__(self):
+        dc = DesiredCapabilities.CHROME
+        dc['loggingPrefs'] = { 'browser':'ALL' }
         self.chrome_options = Options()
         self.chrome_options.add_argument("--no-sandbox")
-        self.wd = webdriver.Chrome()
+        self.wd = webdriver.Chrome(desired_capabilities=dc)
         self.wd.maximize_window()
+
+    d = DesiredCapabilities.CHROME
+    d['loggingPrefs'] = { 'browser':'ALL' }
+
 
     base_url = 'http://localhost/litecart/admin/'
 
@@ -122,6 +129,12 @@ class AdminApp:
     def list_products_in_root_category(self):
         return self.wd.find_elements(By.CSS_SELECTOR, ".dataTable .row")
 
+    @property
+    def list_all_products_in_catalog(self):
+        return self.wd.find_elements(By.CSS_SELECTOR, "table.dataTable [href*='product_id']:not([title]")
+
+    def open_product_page_by_index(self, index):
+        self.list_all_products_in_catalog[index].click()
 
     def click_add_new_product(self):
         self.wd.find_element(By.CSS_SELECTOR, "#content .button:nth-child(2)").click()
